@@ -38,6 +38,8 @@ clip_inset = 18;
 lever_outcrop = 22.75;
 lever_width = 39.75;
 lever_height = 6.8;
+depression_depth = 3.25;
+lever_base_height = lever_height - depression_depth;
 screwbase_outcrop = 15.75;
 screwbase_width = 49.25;
 screwbase_height = 4.5;
@@ -76,7 +78,7 @@ cliplever();
     clip_inset,
     clip_height - 20.75
   ])
-#second_clip_grabber();
+second_clip_grabber();
 
 
 
@@ -178,14 +180,30 @@ module cliplever(){
   }
 
   // base lever
-  difference(){
-    cube([
-      lever_outcrop,
-      lever_width,
-      lever_height
+  edge_radius = lever_height / 2;
+    translate([0,edge_radius,0])
+  cube([
+      lever_outcrop - edge_radius,
+      lever_width - 2*edge_radius,
+      lever_base_height
     ]);
-    lever_depression();
+
+  //right rounded edge
+    translate([lever_outcrop - edge_radius, edge_radius, edge_radius]){
+    rotate(90, v=[-1,0,0])
+  cylinder(r=edge_radius, h=lever_width - (2*edge_radius));
+  sphere(r=edge_radius);
+  translate([0, lever_width - 2*edge_radius, 0])
+  sphere(r=edge_radius);
   }
+  //near rounded edge
+    translate([0, edge_radius, edge_radius])
+    rotate(90, v=[0,1,0])
+  cylinder(r=edge_radius, h=(lever_outcrop - edge_radius) );
+    //far rounded edge
+    translate([0, lever_width - edge_radius, edge_radius])
+    rotate(90, v=[0,1,0])
+  cylinder(r=edge_radius, h=(lever_outcrop - edge_radius) );
 
 
   // lever lip
@@ -201,12 +219,8 @@ module cliplever(){
 module lever_depression(){
   // lever depression
   depression_inset = 7.25;
-  depression_depth = 3.25;
   depression_x = lever_outcrop - depression_inset - clip_thickness;
   depression_width = lever_width - (2*depression_inset);
-
-  echo("x ", depression_x);
-  echo("width ", depression_width);
 
   color([0,0,1])
   translate([
