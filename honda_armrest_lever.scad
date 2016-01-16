@@ -47,6 +47,14 @@ connector_height = 2;
 connector_inset = 15;
 screw_hole_diameter = 5;
 screw_hole_radius = screw_hole_diameter / 2;
+large_screw_hole_depression = 1.4;
+large_screw_hole_diameter = 9;
+large_screw_hole_radius = large_screw_hole_diameter / 2;
+
+second_clip_grabber_outcrop = 1.6;
+second_clip_grabber_width = clip_width + 10.75;
+second_clip_grabber_height = 10;
+fudge = 0.1;
 
 
 
@@ -60,52 +68,77 @@ screwbase();
 connector();
 
   clip_offset_x = screwbase_outcrop + connector_length;
-
   translate([clip_offset_x, 0, 0])
 cliplever();
 
   translate([
-    clip_offset_x,
+    clip_offset_x - second_clip_grabber_outcrop,
     clip_inset,
     clip_height - 20.75
   ])
-second_clip_grabber();
+#second_clip_grabber();
 
 
 
 
 module second_clip_grabber(){
   cube([
-   1.6,
-   21.75 + 10,
-   10
+   second_clip_grabber_outcrop,
+   second_clip_grabber_width,
+   second_clip_grabber_height
   ]);
 }
 
 
 module screwbase() {
   difference(){
-    cube([
-      screwbase_outcrop,
-      screwbase_width,
-      screwbase_height,
-    ]);
+    /*cube([*/
+      /*screwbase_outcrop,*/
+      /*screwbase_width,*/
+      /*screwbase_height,*/
+    /*]);*/
+
+    linear_extrude(height = screwbase_height)
+      difference(){
+        square([
+            screwbase_outcrop,
+            screwbase_width
+        ]);
+
+        far_groove_inset = 2.5;
+        far_groove_width = 9;
+
+        translate([screwbase_outcrop - far_groove_inset,
+            screwbase_width - far_groove_width])
+        square([
+            far_groove_inset + fudge,
+            far_groove_width + fudge
+        ]);
+      }
+
 
     screw_hole_center = screwbase_outcrop / 2;
 
+    // "far" hole
+    distance_from_far_end = 6.25;
     translate([
       screw_hole_center,
-      screwbase_width - 6.25 - screw_hole_radius,
+      screwbase_width - distance_from_far_end - screw_hole_radius,
       -1
     ])
       screw_hole();
 
+    // "close" hole
+    distance_from_close_end = 8.75;
     translate([
       screw_hole_center,
-      8.75 + screw_hole_radius,
+      distance_from_close_end + screw_hole_radius,
       -1
-    ])
+    ]){
       screw_hole();
+      cylinder(r=large_screw_hole_radius,
+        h=large_screw_hole_depression + 1);
+    }
   }
 }
 
@@ -169,16 +202,22 @@ module lever_depression(){
   // lever depression
   depression_inset = 7.25;
   depression_depth = 3.25;
-  color([1,0,0])
+  depression_x = lever_outcrop - depression_inset - clip_thickness;
+  depression_width = lever_width - (2*depression_inset);
+
+  echo("x ", depression_x);
+  echo("width ", depression_width);
+
+  color([0,0,1])
   translate([
     clip_thickness,
     depression_inset,
     lever_height - depression_depth
   ])
     cube([
-      lever_outcrop - depression_inset,
-      lever_width - (2 * depression_inset),
-      depression_depth + 0.1
+      depression_x,
+      depression_width,
+      depression_depth + fudge
     ]);
 
 }
