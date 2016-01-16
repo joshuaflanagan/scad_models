@@ -38,25 +38,50 @@ clip_inset = 18;
 lever_outcrop = 22.75;
 lever_width = 39.75;
 lever_height = 6.8;
-screwbase_outcrop = 22.75; // TODO: Need to measure
+screwbase_outcrop = 15.75;
 screwbase_width = 49.25;
-screwbase_height = 6.8; // TODO: Need to measure
+screwbase_height = 4.5;
 connector_length = 4.75;
 connector_width = 11;
-connector_height = 6.8; // TODO: Need to measure
+connector_height = 2;
 connector_inset = 15;
 screw_hole_diameter = 5;
 screw_hole_radius = screw_hole_diameter / 2;
 
+
+
 screwbase();
 
-translate([screwbase_outcrop, connector_inset, 0 ])
-  connector();
+  translate([
+    screwbase_outcrop,
+    connector_inset,
+    screwbase_height-connector_height
+  ])
+connector();
 
-clip_offset_x = screwbase_outcrop + connector_length;
+  clip_offset_x = screwbase_outcrop + connector_length;
 
-translate([clip_offset_x, 0, 0])
-  cliplever();
+  translate([clip_offset_x, 0, 0])
+cliplever();
+
+  translate([
+    clip_offset_x,
+    clip_inset,
+    clip_height - 20.75
+  ])
+second_clip_grabber();
+
+
+
+
+module second_clip_grabber(){
+  cube([
+   1.6,
+   21.75 + 10,
+   10
+  ]);
+}
+
 
 module screwbase() {
   difference(){
@@ -94,12 +119,30 @@ module connector(){
 
 module cliplever(){
   // vertical clip
-  translate([0, clip_inset, 0])
-  cube([
-    clip_thickness,
-    clip_width,
-    clip_height
-  ]);
+  translate([0, clip_inset, 0]) {
+    cube([
+        clip_thickness,
+        clip_width,
+        clip_height
+        ]);
+
+    // clip endgrip
+    grip_outcrop = 3;
+    grip_width = 15.25;
+    grip_height = 3.5;
+
+      translate([
+        0 - grip_outcrop,
+        grip_width,
+        clip_height-grip_height])
+      rotate(a=90, v=[1,0,0])
+    linear_extrude(height = grip_width)
+    polygon(points=[
+        [0,0],
+        [grip_outcrop,0],
+        [grip_outcrop, grip_height]
+    ]);
+  }
 
   // base lever
   difference(){

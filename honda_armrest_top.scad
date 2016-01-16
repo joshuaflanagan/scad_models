@@ -29,7 +29,7 @@ difference(){
 support_wall_thickness = 2.5;
 
 // side support
-side_support_dip = 14;
+side_support_dip = 20;  //TODO - need to taper in the front
 side_support_height = side_support_dip + height_off_platform;
 
 color([0,1,0])
@@ -44,7 +44,7 @@ cube([support_wall_thickness,
 
 
 //back support
-back_support_dip = 8;
+back_support_dip = 15;
 back_support_height = back_support_dip + height_off_platform;
 back_support_width = top_platform_width + support_wall_thickness;
 
