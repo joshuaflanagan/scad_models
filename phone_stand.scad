@@ -51,12 +51,11 @@ module stand(){
 
     front_angle_shave();
 
-    #front_viewer();
+    front_viewer();
   }
 }
 
 module support(){
-  color([0,0,1])
   rotate([90,0,90])
   linear_extrude(height=support_thickness)
   polygon(points=[
@@ -66,10 +65,10 @@ module support(){
       ]);
 }
 
+backstop_base = phone_insert_depth * sin(90 - phone_angle);
+
 module phone_insert(){
   // the extra thickness added to the bottom of the back wall, because of angled phone insert
-  backstop_base = phone_insert_depth * sin(90 - phone_angle);
-  //  color([0,1,0])
   translate([side_wall_thickness, block_depth - back_wall_thickness - backstop_base, stand_base_height])
     rotate([(phone_angle-90), 0, 0])
     translate([0, -phone_hole_thickness, 0]) // to rotate around back left bottom corner
@@ -77,16 +76,24 @@ module phone_insert(){
 }
 
 module front_angle_shave(){
-  color([0,1,0])
-    translate([-extra, -front_wall_thickness, 0 ])
+  extra_sink = 5;
+  shave_y_offset = (block_height + extra_sink) * sin(90-phone_angle) / sin(phone_angle);
+    translate([-extra, -shave_y_offset, -extra_sink ])
     rotate([phone_angle-90, 0, 0])
     translate([0, -block_depth, 0])
-    cube([block_width + 2 * extra, block_depth, block_height*2]);
+    cube([block_width + 2 * extra, block_depth, block_height*5]);
 }
 
 module front_viewer(){
   viewer_inset = block_height * sin(90-phone_angle) / sin(phone_angle);
 
-  translate([front_wall_width, viewer_inset + front_wall_thickness - block_depth, -extra])
+  // hole that extends out in front of phone, at same angle
+  translate([front_wall_width,  block_depth - back_wall_thickness - backstop_base, stand_base_height])
+  rotate([phone_angle-90, 0, 0])
+  translate([0, -block_depth, 0])
     cube([block_width - (front_wall_width * 2), block_depth, block_height * 2]);
+
+  // hole in between front walls
+  translate([front_wall_width, -(front_wall_thickness + extra), -extra])
+    cube([block_width - (front_wall_width * 2), front_wall_thickness + extra, block_height + extra * 2]);
 }
