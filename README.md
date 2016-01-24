@@ -8,6 +8,8 @@ I plan to publish the more useful models to [Thingiverse](http://www.thingiverse
 
 - [lightsaber clip](http://www.thingiverse.com/thing:1289564) - My first try at
 a customizer. It works well enough.
+- [large phone stand](http://www.thingiverse.com/thing:1289600) - My first attempt
+at a horizontal phone stand. It is way too big.
 
 
 ## License

@@ -1,21 +1,29 @@
-phone_width = 130; // iPhone 5s held horizontal, with case
-phone_thickness = 11.8; // with case
+// Width of the phone when held horizontally (Layout view)
+phone_width = 130;
+// Thickness of phone, including case
+phone_thickness = 11.8;
 
-phone_angle = 76.5;
-phone_insert_depth = 18; // how much of phone you want inserted
+/* [Advanced] */
+phone_angle = 60;
+// How far the phone sinks into stand
+phone_insert_depth = 18;
+// How much wiggle room to allow between phone and stand
+slide_gap = 2;
+// How far back to extend the rear supports
+support_extends = 30;
+// How thick to make the rear supports
+support_thickness = 20;
+
+/* [Hidden] */
 phone_insert_height = phone_insert_depth * sin(phone_angle); // how far into block we need to go to achieve depth
 stand_base_height = 7.5;
 stand_height = stand_base_height + phone_insert_height;
-slide_gap = 2; // how much wiggle room to add between phone and stand
 
 
 side_wall_thickness = 5;
 front_wall_thickness = 6;
 front_wall_width = 15;
 back_wall_thickness = 7;
-support_extends = 30;
-support_thickness = 20;
-support_angle = 40;
 
 phone_hole_width = phone_width + slide_gap;
 phone_hole_thickness = phone_thickness + slide_gap;
