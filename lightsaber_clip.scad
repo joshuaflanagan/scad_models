@@ -1,4 +1,3 @@
-/* [Global] */
 item_diameter=42;
 
 /* [Grip] */
@@ -78,7 +77,7 @@ linear_extrude(height=grip_height){
 
         //grip_gap
         translate([-item_r,0])
-        #square([item_diameter, grip_gap], center=true);
+        square([item_diameter, grip_gap], center=true);
 
     }
 }
