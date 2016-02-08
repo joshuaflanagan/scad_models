@@ -13,7 +13,7 @@ hook_diameter = 30;
 hook_radius = hook_diameter / 2;
 
 hook_offset = 1.5; //offset from mount
-hook_lip = 10; // extends straight at end of hook
+//hook_lip = 10; // extends straight at end of hook
 
 stud_base_width=8; //diameter
 stud_base_r = stud_base_width / 2;
@@ -74,10 +74,15 @@ translate([0, -hook_outer_r - extra])
 square(hook_outer_r * 2 + extra);
     }
     
+    // just enough to connect to mount, prevent manifold issue
+    translate([0, hook_outer_r - thickness])
+    square([extra, thickness]);    
 
     
     
 }
+
+
 
     rounded_end_r = mount_width / 2;
     translate([0, -hook_diameter + thickness, rounded_end_r])
