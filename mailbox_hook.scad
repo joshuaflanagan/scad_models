@@ -72,7 +72,7 @@ module hook(){
 
     rounded_end_r = mount_width / 2;
     translate([0, -hook_diameter + thickness, rounded_end_r])
-    rotate([0, 90, 90])
+    rotate([0, 90, 100])
     linear_extrude(thickness)
     difference(){
       circle(rounded_end_r);
