@@ -26,9 +26,10 @@ stud_head_width = 7.75; //diameter
 stud_head_r = stud_head_width / 2;
 stud_head_height=3;
 
-//connector();
+//!connector();
 
-
+translate([0, (hook_offset + thickness), hook_offset + thickness])
+color([1,0,0])
 mount();
 //translate([0,-hook_offset,-hook_offset])
 rotate([90, 0, 90])
@@ -38,24 +39,25 @@ hook();
         square_size = hook_offset + thickness;
 module connector(){
 
-  connector_curve([-1, 0]);
-  translate([0, (square_size + hook_offset)/2])
+  translate([(square_size + hook_offset + thickness)/2, 0]){
+    connector_curve([-1, 0]);
+  }
   connector_curve([0, -1]);
 }
 
 module connector_curve(quadrant){
   inner_connector_r = hook_offset / 2;
-  outer_connector_r = (hook_offset + thickness) / 2;
+  outer_connector_r = (hook_offset) / 2 + thickness;
   
 
     intersection(){
-     translate(square_size * quadrant)
-     square(square_size);   
-    difference(){
-    circle(outer_connector_r);
+      translate(square_size * quadrant)
+      square(square_size);   
+      difference(){
+        circle(outer_connector_r);
         circle(inner_connector_r);
+      }
     }
-}
 }
 
 module hook(){
@@ -74,9 +76,12 @@ translate([0, -hook_outer_r - extra])
 square(hook_outer_r * 2 + extra);
     }
     
+    
     // just enough to connect to mount, prevent manifold issue
-    translate([0, hook_outer_r - thickness])
-    square([extra, thickness]);    
+    translate([0, hook_outer_r + hook_offset /2])
+    //TODO: size this correctly
+    connector();
+    //square([extra, thickness]);    
 
     
     
