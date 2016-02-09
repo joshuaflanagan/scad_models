@@ -15,10 +15,10 @@ hook_radius = hook_diameter / 2;
 hook_offset = 1.5; //offset from mount
 //hook_lip = 10; // extends straight at end of hook
 
-stud_base_width=8; //diameter
+stud_base_width=7.8; //diameter
 stud_base_r = stud_base_width / 2;
 stud_base_height=2;
-stud_neck_width = 5; //diameter
+stud_neck_width = 4.8; //diameter
 stud_neck_r = stud_neck_width / 2;
 stud_neck_height = 1.65;
 stud_shoulder_height=1.35; // connects base to neck
