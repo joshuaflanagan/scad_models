@@ -12,8 +12,7 @@ stud_distance_between = 21.5;
 hook_diameter = 30;
 hook_radius = hook_diameter / 2;
 
-hook_offset = 1.5; //offset from mount
-//hook_lip = 10; // extends straight at end of hook
+hook_offset = 1.5; //offset from mount to get around edge of door
 
 stud_base_width=7.8; //diameter
 stud_base_r = stud_base_width / 2;
@@ -36,28 +35,11 @@ connector();
 rotate([90, 0, 90])
 hook();
 
-
-square_size = hook_offset + thickness;
-
-module connector(){
-    fudge = .1; //fix manifold issues
-    color([0,0,1])
-    linear_extrude(height=mount_width)
-    polygon(points=[
-      [0,0],
-      [hook_offset+fudge, hook_offset+fudge],
-      [hook_offset, hook_offset + thickness],
-      [0-fudge, thickness-fudge]
-    ]);
-
-}
-
 module hook(){
     hook_outer_r = hook_radius;
     hook_inner_r = hook_radius - thickness;
-    
     extra = 1;
-        
+
     translate([0, -hook_inner_r, 0])
     linear_extrude(height=mount_width){
         difference(){
@@ -68,9 +50,8 @@ module hook(){
         }
     }
 
-
-
     rounded_end_r = mount_width / 2;
+
     translate([0, -hook_diameter + thickness, rounded_end_r])
     rotate([0, 90, 100])
     linear_extrude(thickness)
@@ -79,44 +60,49 @@ module hook(){
       translate([-rounded_end_r - 1, 0])
       square(rounded_end_r*2 + 2);
     }
-
-    
 }
 
 module mount(){
   midpoint = mount_width / 2;
-  
-  linear_extrude(height=thickness){
-    mount_length = mount_height - midpoint;
-    square([mount_width, mount_length]);
-    
+  mount_length = mount_height - midpoint;
 
-    
-      translate([midpoint,mount_length])
-    circle(midpoint);
-      
+  linear_extrude(height=thickness){
+    square([mount_width, mount_length]);
+    translate([midpoint, mount_length])
+      circle(midpoint);
   }
-  
+
   translate([midpoint, stud_distance_from_top, thickness])
   stud();
-  
+
   translate([midpoint, stud_distance_from_top + stud_distance_between, thickness])
   stud();
 }
 
 module stud(){
-   //base
+  //base
   cylinder(r=stud_base_r, h=stud_base_height);
 
-   //shoulders
-   translate([0,0,stud_base_height])
-   cylinder(r=stud_base_r, r2=stud_neck_r, h=stud_shoulder_height);
-    
-    //neck
-    translate([0,0,stud_base_height + stud_shoulder_height])
+  //shoulders
+  translate([0,0,stud_base_height])
+    cylinder(r=stud_base_r, r2=stud_neck_r, h=stud_shoulder_height);
+  //neck
+  translate([0,0,stud_base_height + stud_shoulder_height])
     cylinder(r=stud_neck_r, h=stud_neck_height);
-    
-    //head
-    translate([0,0,stud_base_height + stud_shoulder_height + stud_neck_height])
+  //head
+  translate([0,0,stud_base_height + stud_shoulder_height + stud_neck_height])
     cylinder(r=stud_head_r, h=stud_head_height);
+}
+
+module connector(){
+    fudge = .1; //fix manifold issues
+
+    color([0,0,1])
+    linear_extrude(height=mount_width)
+    polygon(points=[
+      [0,0],
+      [hook_offset+fudge, hook_offset+fudge],
+      [hook_offset,       hook_offset + thickness],
+      [0-fudge,           thickness-fudge]
+    ]);
 }
