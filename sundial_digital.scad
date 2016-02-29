@@ -11,7 +11,8 @@
 //      License: Creative Commons CC-BY (Attribution)
 //
 //*************************************************************//
-
+// Optimized by Margu on 24 november 2015
+//*************************************************************//
 //
 //   [EN]   The episode #001 of the video podcast Mojoptix describes this sundial in details:
 //              http://www.mojoptix.com/fr/2015/10/12/ep-001-cadran-solaire-numerique
@@ -31,7 +32,7 @@
 // 3: the top part of the lid 
 // 4: the bottom part of the lid
 // 10: display everything
-FLAG_PRINT = 4;
+FLAG_PRINT = 1;
 
 FLAG_northern_hemisphere = 1;   // set to 1 for Northen Hemisphere, set to 0 for Southern Hemisphere
 
@@ -166,6 +167,101 @@ font_char = [[
                             [0,0,0,0],
                             [0,0,0,0],
                             [0,0,0,0],
+                       ],
+// Added by Margu : we add some "characters" to display the transitions
+// "0"-"1" transition character has pixels lit only if both corresponding digits are lit (boolean And operation)
+// and so on ...
+                         [
+                            [0,1,0,0],	//index 13: character {"0" to "1" transition}
+                            [1,0,0,0],
+                            [0,0,0,0],
+                            [0,1,0,0],
+                            [0,0,0,0],
+                            [0,1,1,0],
+                       ],[
+                            [0,1,0,0],	//index 14: character {"1" to "2" transition}
+                            [1,0,0,0],
+                            [0,0,0,0],
+                            [0,1,0,0],
+                            [0,0,0,0],
+                            [0,1,1,0],
+                       ],[
+                            [0,1,1,0],	//index 15: character {"2" to "3" transition}
+                            [1,0,0,1],
+                            [0,0,0,1],
+                            [0,0,0,0],
+                            [1,0,0,0],
+                            [0,1,1,0],
+                       ],[
+                            [0,0,0,0],	//index 16: character {"3" to "4" transition}
+                            [1,0,0,1],
+                            [0,0,0,1],
+                            [0,0,0,1],
+                            [0,0,0,1],
+                            [0,0,0,0],
+                       ],[
+                            [1,0,0,1],	//index 17: character {"4" to "5" transition}
+                            [1,0,0,0],
+                            [1,0,0,0],
+                            [0,0,0,1],
+                            [0,0,0,1],
+                            [0,0,0,0],
+                       ],[
+                            [0,1,1,1],	//index 18: character {"5" to "6" transition}
+                            [1,0,0,0],
+                            [1,1,1,0],
+                            [0,0,0,1],
+                            [0,0,0,1],
+                            [0,1,1,0],
+                       ],[
+                            [0,1,1,1],	//index 19: character {"6" to "7" transition}
+                            [0,0,0,0],
+                            [0,0,0,0],
+                            [0,0,0,0],
+                            [0,0,0,0],
+                            [0,0,0,0],
+                       ],[
+                            [1,1,1,1],	//index 20: character {"7" to "8" transition}
+                            [0,0,0,1],  // not used, so wrong values !!!
+                            [0,0,0,1],
+                            [0,0,1,0],
+                            [0,1,0,0],
+                            [1,0,0,0],
+                       ],[
+                            [0,1,1,0],	//index 20: character {"8" to "9" transition}
+                            [1,0,0,1],  // not used, so wrong values !!!
+                            [0,1,1,0],
+                            [1,0,0,1],
+                            [1,0,0,1],
+                            [0,1,1,0],
+                       ],[
+                            [0,1,1,0],	//index 22: character {"9" to "0" transition}
+                            [1,0,0,1],
+                            [1,0,0,1],
+                            [0,1,0,1],
+                            [0,0,0,1],
+                            [0,1,1,0],
+                       ],[  
+                            [0,1,1,0],	//index 23: character {"0" to "2" transition}
+                            [1,0,0,1],
+                            [0,0,0,1],
+                            [0,1,0,0],
+                            [1,0,0,0],
+                            [0,1,1,0],
+                       ],[
+                            [0,0,0,0],	//index 24: character {"2" to "4" transition}
+                            [1,0,0,1],
+                            [0,0,0,1],
+                            [0,1,1,0],
+                            [0,0,0,0],
+                            [0,0,0,1],
+                       ],[
+                            [0,0,0,0],	//index 25: character {"4" to "0" transition}
+                            [1,0,0,1],
+                            [1,0,0,1],
+                            [1,1,0,1],
+                            [0,0,0,1],
+                            [0,0,0,0],
                        ]
                       ];
 
@@ -190,13 +286,14 @@ module extrude_pixel(direction_angle_x,direction_angle_y, pixel_wall_angle_x, pi
     top_pixel_size_x = pixel_size_x +2*top_pixel_location_z*tan(pixel_wall_angle_x);    // account for the non_vertical pixel walls
     top_pixel_size_y = pixel_size_y +2*top_pixel_location_z*tan(pixel_wall_angle_y);
     // build (positive) geometry: extrude vertically then rotate
-    rotate([direction_angle_y,direction_angle_x,0])     // rotate the whole extrusion in the chosen direction
+  union() {  rotate([direction_angle_y,direction_angle_x,0])     // rotate the whole extrusion in the chosen direction
         hull(){
             rotate([-direction_angle_y,-direction_angle_x,0])  // derotate the base pixel (to keep it flat at the bottom)
                 cube([pixel_size_x,pixel_size_y,epsilon_thickness], center=true);
             translate([0,0,top_pixel_location_z])
                 cube([top_pixel_size_x, top_pixel_size_y,epsilon_thickness], center=true);
         }
+    }
 }
 
 
@@ -270,7 +367,6 @@ module build_create_pixel_grid(pixel_depth, ID_column_OFF=[]) {
 module build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y) {
 /* Build a block with a set of characters */
     difference(){
-        union(){
         // Build The gnomon shape
             intersection(){
                 translate([0,0,gnomon_radius/2])
@@ -278,8 +374,7 @@ module build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixe
                 translate([0,0,0])
                         rotate([90,0,90]) cylinder(r=gnomon_radius, h=gnomon_thickness, center=true, $fn=100);
             }
-        }
-            
+    
         // Carve the light guides for each number
         for (ti = [0:(len(char_list)-1)]){
             extrude_character(char_list[ti],char_angle_x[ti],char_angle_y[ti], pixel_wall_angle_x, pixel_wall_angle_y);
@@ -356,10 +451,18 @@ module Block_hours_tens() {
     gnomon_thickness = gnomon_radius*45.0/40.0; //45;
     pixel_wall_angle_x = 0;         // [degrees] angle of the walls along the x direction
     pixel_wall_angle_y = 6.0;         // [degrees] angle of the walls along the y direction    
-    char_angle_x = [0,0,0,0,0,0,0];
+
+/*    char_angle_x = [0,0,0,0,0,0,0];
     char_angle_y = [-45,-30,-15,0,15,30,45];
-    char_list = [1,1,1,1,1,1,1];
-    difference(){
+    char_list = [1,1,1,1,1,1,1]; 
+*/
+// Modified by Margu
+// We add intermediate angles (-37, -22, -15, -8, 8, 15, 22, 37) to display transition characters thus removing not needed material.
+//  Because there is no need to make a dark transition for pixels which remain lit
+    char_angle_x = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+    char_angle_y = [ -45,-37,  -30,  -22,  -15,  -8,  0,  8,  15,  22,  30,  38,  45];
+    char_list = [1,1,1,1,1,1,1,1,1,1,1,1,1];     
+      difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[]);
     }
@@ -371,9 +474,14 @@ module Block_hours_units() {
     gnomon_thickness = gnomon_radius*45.0/40.0; //45;
     pixel_wall_angle_x = 0;         // [degrees] angle of the walls along the x direction
     pixel_wall_angle_y = 6.0;         // [degrees] angle of the walls along the y direction    
-    char_angle_x = [0,0,0,0,0,0,0];
-    char_angle_y = [-45,-30,-15,0,15,30,45];
-    char_list = [0,1,2,3,4,5,6];
+
+// Modified by Margu
+// We add intermediate angles (-37, -22, -15, -8, 8, 15, 22, 37) to display transition characters thus removing not needed material.
+//  Because there is no need to make a dark transition for pixels which remain lit
+    char_angle_x = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+    char_angle_y = [-45,-38,-30, -22, -15,-8,0,8,15,22,30,38,45];
+    char_list = [0,13,1,14,2,15,3,16,4,17,5,18,6];
+
     difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[]);
@@ -385,10 +493,15 @@ module Block_minutes_tens() {
     color("blue"){
     gnomon_thickness = gnomon_radius*45.0/40.0; //45;
     pixel_wall_angle_x = 0;         // [degrees] angle of the walls along the x direction
-    pixel_wall_angle_y = 1.0;         // [degrees] angle of the walls along the y direction    
-    char_angle_x = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0];
-    char_angle_y = [-50,-45,-40, -35,-30,-25, -20,-15,-10, -5,0,5, 10,15,20, 25,30,35, 40];
-    char_list = [0,2,4, 0,2,4, 0,2,4, 0,2,4, 0,2,4, 0,2,4, 0];
+    pixel_wall_angle_y = 1.0;         // [degrees] angle of the walls along the y direction 
+        
+// Modified by Margu
+// We add intermediate angles (-48, -43, -38, -22, -15, -8, 8, 15, 22, 38, 43, 48) to display transition characters thus removing not needed material.
+//  Because there is no need to make a dark transition for pixels which remain lit    
+    char_angle_x = [0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0,  0];
+    char_angle_y = [-50,-48,-45,-43,-40,-38, -35,-33,-30,-28,-25,-23, -20,-18,-15,-13,-10,-8, -5,-3,0,3,5,8, 10,13,15,18,20,23, 25,28,30,33,35,38, 40];
+    char_list = [0,23,2,24,4,25,0,23,2,24,4,25,0,23,2,24,4,25,0,23,2,24,4,25,0,23,2,24,4,25,0,23,2,24,4,25, 0];
+
     difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[]);
@@ -401,10 +514,13 @@ module Block_minutes_units() {
     gnomon_thickness = gnomon_radius*45.0/40.0; //45;
     pixel_wall_angle_x = 0;         // [degrees] angle of the walls along the x direction
     pixel_wall_angle_y = 8.0;         // [degrees] angle of the walls along the y direction    
+
+
     char_angle_x = [0,0,0,0,0,0,0];
     char_angle_y = [-45,-30,-15,0,15,30,45];
     char_list = [0,0,0,0,0,0,0];
-    difference(){
+    
+        difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[]);
     }    
@@ -416,9 +532,12 @@ module Block_semicolon() {
     gnomon_thickness = gnomon_radius*25.0/40.0; //25;
     pixel_wall_angle_x = 0;         // [degrees] angle of the walls along the x direction
     pixel_wall_angle_y = 8.0;         // [degrees] angle of the walls along the y direction    
+
+
     char_angle_x = [0,0,0,0,0,0,0];
     char_angle_y = [-45,-30,-15,0,15,30,45];
     char_list = [10,10,10,10,10,10,10];
+
     difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[3]);
@@ -758,7 +877,7 @@ module Gnomon_Digits(nn) {
     translate([-14.5/nn,0,0])    Block_minutes_tens();
     translate([-42/nn,0,0]) build_spacer_block(10/nn);
     translate([-69.5/nn,0,0])   Block_minutes_units();    
-    
+     
 }
 
 /* ************************************************************************/
