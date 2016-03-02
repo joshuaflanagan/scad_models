@@ -461,7 +461,19 @@ module Block_hours_tens() {
 //  Because there is no need to make a dark transition for pixels which remain lit
     char_angle_x = [0,0,0,0,0,0,0,0,0,0,0,0,0];
     char_angle_y = [ -45,-37,  -30,  -22,  -15,  -8,  0,  8,  15,  22,  30,  38,  45];
-    char_list = [1,1,1,1,1,1,1,1,1,1,1,1,1];     
+    char_list = [1, //10
+                 1,
+                 1, //11
+                 1,
+                 1, //12
+                 13, // use transition from 1->0 (really going to black)
+                 12, //13, 01
+                 12,
+                 12, //14 02
+                 12,
+                 12, //15 03
+                 12,
+                 12];// 16 04
       difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
         build_create_pixel_grid(grid_pixel_depth, ID_column_OFF=[]);
@@ -480,7 +492,19 @@ module Block_hours_units() {
 //  Because there is no need to make a dark transition for pixels which remain lit
     char_angle_x = [0,0,0,0,0,0,0,0,0,0,0,0,0];
     char_angle_y = [-45,-38,-30, -22, -15,-8,0,8,15,22,30,38,45];
-    char_list = [0,13,1,14,2,15,3,16,4,17,5,18,6];
+    char_list = [0,  // 10
+                 13, // trans 0-1
+                 1,  // 11
+                 14, // trans 1-2
+                 2,  // 12
+                 14, // trans 2-1 (2->1 == 1->2)
+                 1,  // 13
+                 14, // trans 1-2
+                 2,  // 14
+                 15, // trans 2-3
+                 3,  // 15
+                 16, // trans 3-4
+                 4]; // 16
 
     difference(){
         build_block(gnomon_thickness, char_list, char_angle_x, char_angle_y, pixel_wall_angle_x, pixel_wall_angle_y);
