@@ -32,7 +32,7 @@ button();
 //translate([-fb_side/2,-fb_side/2,0])
 //cube([fb_side,fb_side,4]);
 
-translate([0,0,button_face_thickness*2])
+translate([0,-2,button_face_thickness*2])
 resize([0,0,button_face_thickness*4])
 dva_cutout();
 }
