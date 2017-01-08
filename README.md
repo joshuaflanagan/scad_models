@@ -11,6 +11,10 @@ a customizer. It works well enough.
 - [large phone stand](http://www.thingiverse.com/thing:1289600) - My first attempt
 at a horizontal phone stand. It is way too big.
 
+### Others
+
+- dva_power_button.scad - replace the power button on a Rosewill Dual Fans case with a D.Va logo (from the game Overwatch)
+
 
 ## License
 
