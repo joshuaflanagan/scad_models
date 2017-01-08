@@ -9,7 +9,7 @@ button_face_thickness = 1.6;
 
 button_prong_height = 15.52; // from face of button
 button_prong_width = 5.85;
-button_prong_thickness = 1;
+button_prong_thickness = button_wall_thickness;
 
 button_clip_overhang = 1.4;
 button_clip_height = 3.15;
