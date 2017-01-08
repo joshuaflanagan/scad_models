@@ -17,8 +17,8 @@ button_clip_height = 3.15;
 button_plunger_height = 8.7;
 button_plunger_thickness=5.22;  //same access as prong thickness
 button_plunger_width=4.2;
-plunger_hollow_thickness=3;
-plunger_hollow_width=1.98;
+plunger_hollow_thickness=3.22;
+plunger_hollow_width=2.2;
 plunger_hollow_depth=3.88;
 
 cutout_height=1;
@@ -101,7 +101,7 @@ module dva_backdrop(){
 }
 
 module dva_logo() {
-logo_path = "/Users/josh/Downloads/dva_logo_white_on_black.png";
+logo_path = "dva_logo_white_on_black_no_pupils.png";
 
 translate([0,0,-0.5])
   difference(){
