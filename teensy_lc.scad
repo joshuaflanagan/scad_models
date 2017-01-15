@@ -5,9 +5,9 @@
 //
 
 
-teensy_lc(pin_holes=true, microcontroller=true);
+teensy_lc(pin_holes=true, microcontroller=true, bounding_box=true);
 
-module teensy_lc(pin_holes=true, microcontroller=true){
+module teensy_lc(pin_holes=true, microcontroller=true, bounding_box=false){
 //$fa=1;
 //$fs=.7;
 $fn=8;
@@ -18,6 +18,7 @@ board_thickness=1.57;
 board_length = spec_length;
 manufacturing_variance = 0.18; // change this per board?
 board_width = spec_width + manufacturing_variance;
+usb_height = 2.5;
 
 pin_separation=2.54;
 pin_offset=pin_separation / 2;
@@ -28,30 +29,33 @@ center_line = top_pin_line - (pin_separation * 3);
 
 center_of_first_pin_to_center_of_reset = 29.85;
 
-color("green")
-pcb(pin_holes=pin_holes);
+if (bounding_box){
+  cube([board_length, board_width, board_thickness + usb_height]);
+} else {
+  color("green")
+  pcb(pin_holes=pin_holes);
 
-if (microcontroller) {
-  color("black")
-  // offset from right edge is an approximation
-  translate([board_length - 12.5, center_line, board_thickness])
-  microcontroller();
+  if (microcontroller) {
+    color("black")
+    // offset from right edge is an approximation
+    translate([board_length - 12.5, center_line, board_thickness])
+    microcontroller();
+  }
+
+  translate([pin_offset + center_of_first_pin_to_center_of_reset,
+             center_line,
+             board_thickness])
+  reset_button();
 }
 
 color("silver")
-usb_connector();
-
-translate([pin_offset + center_of_first_pin_to_center_of_reset,
-           center_line,
-           board_thickness])
-reset_button();
+usb_connector(bounding_box=bounding_box);
 
 
 
-module usb_connector(){
+module usb_connector(bounding_box=false){
   usb_width = 7.5;
   usb_length = 5;
-  usb_height = 2.5;
 
   usb_flap_width = 8.06;
   usb_flap_height = 3.07;
@@ -61,15 +65,24 @@ module usb_connector(){
 
 
   translate([-usb_overhang, center_line - (usb_width / 2), board_thickness]){
-  cube([usb_length, usb_width, usb_height]);
+    if (bounding_box){
+        translate([
+          0,
+          -(usb_flap_width - usb_width) / 2,
+          -(usb_flap_height - usb_height) / 2,
+          ])
+      cube([usb_length, usb_flap_width, usb_flap_height]);
+    } else {
+      cube([usb_length, usb_width, usb_height]);
 
-  translate([
-    0,
-    -(usb_flap_width - usb_width) / 2,
-    -(usb_flap_height - usb_height) / 2,
-    ])
-  cube([usb_flap_length, usb_flap_width, usb_flap_height]);
-  }
+      translate([
+        0,
+        -(usb_flap_width - usb_width) / 2,
+        -(usb_flap_height - usb_height) / 2,
+        ])
+      cube([usb_flap_length, usb_flap_width, usb_flap_height]);
+        }
+    }
 }
 
 
