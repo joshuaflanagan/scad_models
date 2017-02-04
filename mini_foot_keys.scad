@@ -1,7 +1,7 @@
 // 6-key keyboard with foot pedal
 
 cherry_switch_side = 14;
-cherry_switch_thickness = 1.4;
+key_plate_thickness = 1.4;
 switch_end_gap = 5;
 switch_between_gap = 5;
 
@@ -24,16 +24,20 @@ tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length;
 tray_height = 6;
 tray_give = 0.2;
 
-key_plate_wall_thickness = 3;
-key_plate_width =(2*switch_end_gap) + (3*cherry_switch_side) + (2*switch_between_gap) + (2*key_plate_wall_thickness);
-key_plate_depth =(2*switch_end_gap) + (2*cherry_switch_side) + switch_between_gap + (2*key_plate_wall_thickness);
+key_plate_wall_thickness = 2;
+key_plate_width =(2*switch_end_gap) + (3*cherry_switch_side) + (2*switch_between_gap);
+key_plate_depth =(2*switch_end_gap) + (2*cherry_switch_side) + switch_between_gap;
 key_plate_wall_height = switch_under_gap;
+
+outer_w = key_plate_width + (2*key_plate_wall_thickness);
+outer_d = key_plate_depth + (2*key_plate_wall_thickness);
 
 base_bottom_thickness = 1;
 base_wall_thickness = key_plate_wall_thickness;
-base_d = key_plate_depth;
-base_l = key_plate_width;
+base_d = outer_d;
+base_l = outer_w;
 base_h = base_bottom_thickness + phone_holder_h;
+
 
 
 // position the components
@@ -41,7 +45,8 @@ tray_x = 0;
 tray_y = base_wall_thickness;
 tray_z = base_bottom_thickness;
 
-phone_box_x = base_wall_thickness;
+phone_box_face_thickness = 0.8;
+phone_box_x = phone_box_face_thickness;
 phone_box_y = tray_y + tray_width;
 phone_box_z = base_bottom_thickness;
 
@@ -52,9 +57,9 @@ phone_holder_backup_thickness = 1.6;
 
 
 
-translate([0, key_plate_depth, base_h + key_plate_wall_height])
+translate([0, outer_d, base_h + key_plate_wall_height])
 //rotate(a=180, v=[1,0,0])
-color("blue")
+//color("blue")
 key_plate();
 
 color("orange")
@@ -87,7 +92,7 @@ module base(){
     ]);
 
     //cutout for teensy tray
-    translate([-1, 0, base_bottom_thickness])
+    translate([-1, base_wall_thickness, base_bottom_thickness])
     cube([1 + tray_length, tray_width, tray_height]);
 
     //cutout for phone jack
@@ -126,13 +131,15 @@ module phone_box(){
 
 
 module key_plate(){
-  linear_extrude(height=cherry_switch_thickness){
+  color("pink")
+  translate([key_plate_wall_thickness, key_plate_wall_thickness, 0])
+  linear_extrude(height=key_plate_thickness){
     difference(){
       square([
         key_plate_width,
         key_plate_depth
       ]);
-      
+
       for(i=[0:2]){
       translate([switch_end_gap + (i * (cherry_switch_side + switch_between_gap)), switch_end_gap])
       switch_mount();
@@ -143,16 +150,40 @@ module key_plate(){
       }
     }
   }
-  
+
   difference(){
-    cube([key_plate_width, key_plate_depth, key_plate_wall_height]);
+    cube([outer_w, outer_d, key_plate_wall_height]);
     translate([key_plate_wall_thickness, key_plate_wall_thickness, -1])
     cube([
-      key_plate_width - (2*key_plate_wall_thickness),
-      key_plate_depth - (2*key_plate_wall_thickness),
+      key_plate_width,
+      key_plate_depth,
       2 * key_plate_wall_height 
     ]);
    }
+
+  post_offset = 0.2;
+  post_thickness = switch_between_gap - (2*post_offset);
+
+  translate([key_plate_wall_thickness, key_plate_wall_thickness, 0]){
+    translate([
+      switch_end_gap + cherry_switch_side + post_offset,
+      switch_end_gap + cherry_switch_side + post_offset,
+      0
+    ])
+    keyplate_post();
+
+    translate([
+      switch_end_gap + (2*cherry_switch_side) + switch_between_gap + post_offset,
+      switch_end_gap + cherry_switch_side + post_offset,
+      0
+    ])
+    keyplate_post();
+  }
+
+
+  module keyplate_post(){
+    cube([post_thickness, post_thickness, key_plate_wall_height]);
+  }
 
   module switch_mount(){
     square(cherry_switch_side);
