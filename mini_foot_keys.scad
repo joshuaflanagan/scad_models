@@ -10,10 +10,13 @@ switch_under_gap = 8;
 phone_box_w = 22;
 phone_box_h = 15.4;
 phone_box_depth = 15.4;
+phone_holder_w = phone_box_w;
+phone_holder_h = phone_box_h;
+phone_holder_depth = phone_box_depth + 0.1;
 
 include <teensy_lc.scad>
 
-teensy_tray_bottom_thickness = 0.8;
+teensy_tray_bottom_thickness = 1;
 teensy_tray_top_thickness = 0.8;
 tray_wall_thickness = 1;
 tray_width = (tray_wall_thickness * 2) + teensy_lc_board_width;
@@ -30,18 +33,20 @@ base_d = key_plate_depth;
 base_l = key_plate_width;
 base_bottom_thickness = 1;
 base_wall_thickness = 1;
-base_h = base_bottom_thickness + phone_box_h + key_plate_wall_height;
+base_h = base_bottom_thickness + phone_holder_h;
 
-translate([0, key_plate_depth, base_h])
-rotate(a=180, v=[1,0,0])
+translate([0, key_plate_depth, base_h + key_plate_wall_height])
+//rotate(a=180, v=[1,0,0])
+color("blue")
 key_plate();
 
-%base();
+color("orange")
+base();
 
 translate([0, 0, base_bottom_thickness])
 teensy_tray();
 
-color("white")
+%color("white")
 translate([base_wall_thickness, tray_width, base_bottom_thickness])
 phone_box();
 
@@ -50,7 +55,41 @@ phone_box();
 
 
 module base(){
-  cube([base_l, base_d, base_h]);
+  difference(){
+    cube([base_l, base_d, base_h]);
+    translate([base_wall_thickness, base_wall_thickness, base_bottom_thickness])
+    cube([
+      base_l - (2*base_wall_thickness),
+      base_d - (2*base_wall_thickness),
+      base_h * 2
+    ]);
+    
+    //cutout for teensy tray
+    translate([-1, 0, base_bottom_thickness])
+    cube([1 + tray_length, tray_width, tray_height]);
+    
+    //cutout for phone jack
+    jack_w = 12;
+    jack_h = 12;
+    jack_bottom_overhang = 1.5;
+    jack_side_overhang = 0.8;
+    translate([-1, base_d - jack_w - base_wall_thickness - jack_side_overhang, base_bottom_thickness + jack_bottom_overhang])
+    cube([5, jack_w, jack_h]);
+  }
+  
+  // phone holder backup
+  translate([phone_holder_depth+ 2, tray_width, base_bottom_thickness])
+  rotate(a=-90, v=[0,1,0])
+  linear_extrude(height=0.8){
+    cutout_r = phone_holder_w/2 - 1;
+    holder_wall_height = 0.8 * phone_holder_h;
+    
+    difference(){
+      square([ holder_wall_height, phone_holder_w]);
+      translate([holder_wall_height, cutout_r + 1])
+      circle(r=cutout_r);
+    }
+  }
 }
 
 module phone_box(){
