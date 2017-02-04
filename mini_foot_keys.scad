@@ -1,4 +1,6 @@
 // 6-key keyboard with foot pedal
+$fa=1;
+$fs=.7;
 
 cherry_switch_side = 14;
 key_plate_thickness = 1.4;
@@ -28,17 +30,20 @@ key_plate_wall_thickness = 2;
 key_plate_width =(2*switch_end_gap) + (3*cherry_switch_side) + (2*switch_between_gap);
 key_plate_depth =(2*switch_end_gap) + (2*cherry_switch_side) + switch_between_gap;
 key_plate_wall_height = switch_under_gap;
+key_post_insertion = 5;
+key_post_height = key_plate_wall_height + key_post_insertion;
+key_post_sides = 6;
 
+top_padding_front_y = 1.8;
+top_padding_back_y = 1;
 outer_w = key_plate_width + (2*key_plate_wall_thickness);
-outer_d = key_plate_depth + (2*key_plate_wall_thickness);
+outer_d = key_plate_depth + (2*key_plate_wall_thickness) + top_padding_front_y + top_padding_back_y;
 
 base_bottom_thickness = 1;
 base_wall_thickness = key_plate_wall_thickness;
 base_d = outer_d;
 base_l = outer_w;
 base_h = base_bottom_thickness + phone_holder_h;
-
-
 
 // position the components
 tray_x = 0;
@@ -53,14 +58,22 @@ phone_box_z = base_bottom_thickness;
 phone_holder_backup_x = phone_box_x + phone_holder_depth;
 phone_holder_backup_y = tray_y + tray_width;
 phone_holder_backup_z = base_bottom_thickness;
-phone_holder_backup_thickness = 1.6;
+phone_holder_backup_thickness = 2;
+phone_holder_side_thickness = 1;
 
+post_offset = 0.2;
+post_thickness = switch_between_gap - (2*post_offset);
+key_post_radius = post_thickness/2;
+base_post_inner_radius = key_post_radius;
+base_post_wall_thickness = 1;
+base_post_radius = base_post_inner_radius + base_post_wall_thickness;
+base_post_side = base_post_radius * 2;
 
 
 translate([0, outer_d, base_h + key_plate_wall_height])
 //rotate(a=180, v=[1,0,0])
 //color("blue")
-key_plate();
+#top();
 
 color("orange")
 base();
@@ -75,9 +88,38 @@ phone_box();
 translate([phone_holder_backup_x, phone_holder_backup_y, phone_holder_backup_z])
 phone_holder_backup();
 
+translate([phone_box_x, phone_box_y + phone_box_w, 0])
+phone_holder_side();
+
+translate([
+  key_plate_wall_thickness,
+  outer_d - key_plate_wall_thickness - top_padding_back_y,
+  0])
+{
+  base_post_y_line = -switch_end_gap - cherry_switch_side - post_offset - base_post_side + base_post_wall_thickness;
+
+  translate([switch_end_gap + cherry_switch_side - base_post_wall_thickness + post_offset,
+     base_post_y_line,
+     0])
+  base_post();
+
+  translate([switch_end_gap + cherry_switch_side - base_post_wall_thickness + post_offset + switch_between_gap + cherry_switch_side,
+     base_post_y_line,
+     0])
+  base_post();
+}
 
 
 
+module base_post(){
+  post_hole_depth = key_post_insertion + 0.6; // allow some wiggle at bottom
+  base_post_base_leeway = 0.2;
+  difference(){
+    cube([base_post_side, base_post_side, base_h - base_post_base_leeway]);
+    translate([base_post_radius, base_post_radius, (base_h - post_hole_depth)])
+    cylinder(r=base_post_inner_radius, h=post_hole_depth + 1);
+  }
+}
 
 module base(){
   difference(){
@@ -102,12 +144,13 @@ module base(){
     jack_side_overhang = 0.8;
     translate([
       -1,
-      base_d - jack_w - base_wall_thickness - jack_side_overhang, // lower left corner of cutout
+      phone_box_y + phone_holder_w - jack_w - jack_side_overhang, // lower left corner of cutout
       base_bottom_thickness + jack_bottom_overhang
     ])
     cube([5, jack_w, jack_h]);
   }
 }
+
 
 
 module phone_holder_backup(){
@@ -118,11 +161,19 @@ module phone_holder_backup(){
     holder_wall_height = 0.8 * phone_holder_h;
 
     difference(){
-      square([ holder_wall_height, phone_holder_w]);
+      square([ holder_wall_height, phone_holder_w + phone_holder_side_thickness]);
       translate([holder_wall_height, cutout_r + 1])
       circle(r=cutout_r);
     }
   }
+}
+
+module phone_holder_side(){
+  cube([
+    phone_holder_depth,
+    phone_holder_side_thickness,
+    phone_holder_h/2
+  ]);
 }
 
 module phone_box(){
@@ -130,41 +181,44 @@ module phone_box(){
 }
 
 
-module key_plate(){
+module top(){
+  // the key plate
   color("pink")
   translate([key_plate_wall_thickness, key_plate_wall_thickness, 0])
   linear_extrude(height=key_plate_thickness){
     difference(){
       square([
         key_plate_width,
-        key_plate_depth
+        key_plate_depth + top_padding_front_y + top_padding_back_y
       ]);
 
-      for(i=[0:2]){
-      translate([switch_end_gap + (i * (cherry_switch_side + switch_between_gap)), switch_end_gap])
-      switch_mount();
-      }
-      for(i=[0:2]){
-      translate([switch_end_gap + (i * (cherry_switch_side + switch_between_gap)), switch_end_gap + switch_between_gap + cherry_switch_side])
-      switch_mount();
+      translate([0, top_padding_back_y, 0]){
+        for(i=[0:2]){
+          translate([switch_end_gap + (i * (cherry_switch_side + switch_between_gap)), switch_end_gap])
+          switch_mount();
+        }
+        for(i=[0:2]){
+          translate([switch_end_gap + (i * (cherry_switch_side + switch_between_gap)), switch_end_gap + switch_between_gap + cherry_switch_side])
+          switch_mount();
+        }
       }
     }
   }
 
+  //top walls
   difference(){
     cube([outer_w, outer_d, key_plate_wall_height]);
     translate([key_plate_wall_thickness, key_plate_wall_thickness, -1])
     cube([
       key_plate_width,
-      key_plate_depth,
+      key_plate_depth + top_padding_front_y + top_padding_back_y,
       2 * key_plate_wall_height 
     ]);
    }
 
-  post_offset = 0.2;
-  post_thickness = switch_between_gap - (2*post_offset);
 
-  translate([key_plate_wall_thickness, key_plate_wall_thickness, 0]){
+  // posts
+  translate([key_plate_wall_thickness, key_plate_wall_thickness + top_padding_back_y, 0]){
     translate([
       switch_end_gap + cherry_switch_side + post_offset,
       switch_end_gap + cherry_switch_side + post_offset,
@@ -183,6 +237,9 @@ module key_plate(){
 
   module keyplate_post(){
     cube([post_thickness, post_thickness, key_plate_wall_height]);
+    /*cube([post_thickness, post_thickness, key_post_height]);*/
+    translate([key_post_radius, key_post_radius, 0])
+    cylinder(r=key_post_radius, h=key_post_height, $fn=key_post_sides);
   }
 
   module switch_mount(){
@@ -230,7 +287,6 @@ module teensy_tray(){
 
   }  // end difference
   
-  /*
   // peg platform
   platform_l = 6;
   translate([tray_length, 0, 0])
@@ -243,7 +299,6 @@ module teensy_tray(){
   cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
   translate([tray_length + (platform_l / 2), tray_width * 3 / 4, 0])
   cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
-*/
 
   //temp cap test
   /*
