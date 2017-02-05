@@ -2,7 +2,20 @@
 $fa=1;
 $fs=.7;
 
-cherry_switch_side = 14;
+/*
+ ISSUES
+
+1) DONE phone box isnt hollowed out in front. not enough room
+2) DONE need a little more room in the length of the tray gap
+3) key plate needs to be on a raft? print holes a little larger? specified 14 - printed 13.8
+4) DONE lip the edges so the fasten together
+5) DONE reduce post insertion. too strong
+6) HOLD add posts to corners? may not be needed with lipped edges
+7) DONE slope the front. looks better - can differentiate front from back
+
+*/
+
+cherry_switch_side = 14.0;
 key_plate_thickness = 1.4;
 switch_end_gap = 5;
 switch_between_gap = 5;
@@ -12,9 +25,9 @@ switch_under_gap = 8;
 phone_box_w = 22;
 phone_box_h = 15.4;
 phone_box_depth = 15.4;
-phone_holder_w = phone_box_w;
+phone_holder_w = phone_box_w + 0.2;
 phone_holder_h = phone_box_h;
-phone_holder_depth = phone_box_depth + 0.1;
+phone_holder_depth = phone_box_depth + 0.2;
 
 include <teensy_lc.scad>
 
@@ -22,7 +35,7 @@ teensy_tray_bottom_thickness = 1;
 teensy_tray_top_thickness = 0.8;
 tray_wall_thickness = 1;
 tray_width = (tray_wall_thickness * 2) + teensy_lc_board_width;
-tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length;
+tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length + 0.2;
 tray_height = 6;
 tray_give = 0.2;
 
@@ -30,7 +43,7 @@ key_plate_wall_thickness = 2;
 key_plate_width =(2*switch_end_gap) + (3*cherry_switch_side) + (2*switch_between_gap);
 key_plate_depth =(2*switch_end_gap) + (2*cherry_switch_side) + switch_between_gap;
 key_plate_wall_height = switch_under_gap;
-key_post_insertion = 5;
+key_post_insertion = 3.5;
 key_post_height = key_plate_wall_height + key_post_insertion;
 key_post_sides = 6;
 
@@ -73,7 +86,7 @@ base_post_side = base_post_radius * 2;
 translate([0, outer_d, base_h + key_plate_wall_height])
 //rotate(a=180, v=[1,0,0])
 //color("blue")
-#top();
+lid();
 
 color("orange")
 base();
@@ -88,7 +101,7 @@ phone_box();
 translate([phone_holder_backup_x, phone_holder_backup_y, phone_holder_backup_z])
 phone_holder_backup();
 
-translate([phone_box_x, phone_box_y + phone_box_w, 0])
+translate([phone_box_x, phone_box_y + phone_holder_w, 0])
 phone_holder_side();
 
 translate([
@@ -109,7 +122,21 @@ translate([
   base_post();
 }
 
+color("purple")
+translate([0,0, base_h])
+connection_rim();
 
+rim_height = 2;
+rim_thickness = 1;
+
+
+module connection_rim(){
+  difference(){
+    cube([outer_w, outer_d, rim_height]);
+    translate([rim_thickness, rim_thickness, - 0.5])
+    cube([outer_w - (2*rim_thickness), outer_d - (2*rim_thickness), 10]);
+  }
+}
 
 module base_post(){
   post_hole_depth = key_post_insertion + 0.6; // allow some wiggle at bottom
@@ -148,6 +175,9 @@ module base(){
       base_bottom_thickness + jack_bottom_overhang
     ])
     cube([5, jack_w, jack_h]);
+
+    translate([phone_box_x, phone_box_y, phone_box_z])
+    phone_box();
   }
 }
 
@@ -181,7 +211,7 @@ module phone_box(){
 }
 
 
-module top(){
+module lid(){
   // the key plate
   color("pink")
   translate([key_plate_wall_thickness, key_plate_wall_thickness, 0])
@@ -214,6 +244,14 @@ module top(){
       key_plate_depth + top_padding_front_y + top_padding_back_y,
       2 * key_plate_wall_height 
     ]);
+    translate([0, 0, key_plate_wall_height - rim_height])
+    connection_rim();
+
+#color("green")
+translate([-10, outer_d - key_plate_wall_thickness, 0])
+rotate(a=30, v=[-1, 0, 0])
+cube([outer_w +20, key_plate_wall_thickness * 4, 20]);
+
    }
 
 
