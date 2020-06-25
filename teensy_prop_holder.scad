@@ -1,170 +1,197 @@
-include <teensy_lc.scad>
 
-  kt_width = 25;
-  kt_length=119.5;
-  kt_height=10.5;
-  kt_thickness = 1.5;
+shield_length = 48.55;
+shield_width = 17.84;
+shield_board_height = 4; // approximate - with solder pins
+shield_post_hole_radius = 1.11;
+//shield_post_hole_radius = 2;
 
+shield_post_hole_length_offset=3.8;
+shield_post_hole_width_offset=2;
+shield_post_height = shield_board_height + 1;
+shield_post_sides=6; // determine shape of post
 
-holder_bottom_groove_depth = 2;
-holder_side_groove_depth = 2;
-holder_side_length = 5;
-holder_end_thickness = holder_side_length - holder_side_groove_depth;
-holder_face_thickness = 2;
-holder_bottom_length = kt_length + (2 * holder_end_thickness);
-holder_bottom_width = kt_width + (2 * holder_face_thickness);
-holder_bottom_thickness = 4;
+wall_thickness=2;
+base_bottom_thickness=1;
+roominess = 0.2;
 
+base_post_platform_length = 12;
+base_void_length =shield_length + 2 * roominess;
+base_void_width = shield_width + 2 * roominess;
+base_void_wall_height = 16;
+ 
+base_length = base_void_length + 2 * wall_thickness + base_post_platform_length;
+base_width = base_void_width + 2 * wall_thickness;
+base_height = base_void_wall_height + base_bottom_thickness;
 
-// holder bottom
-difference() {
-  cube([ holder_bottom_length, holder_bottom_width, holder_bottom_thickness]);
+rim_overhang = wall_thickness / 2;
+rim_depth = 2;
 
-//grooves
-  translate([holder_end_thickness, holder_face_thickness, holder_bottom_groove_depth])
-  cube([kt_length, kt_thickness, kt_height]);
+lid_void_length = base_void_length;
+lid_void_width = base_void_width;
+lid_void_height = 4;
 
-  translate([holder_end_thickness, kt_width - holder_face_thickness, holder_bottom_groove_depth])
-  cube([kt_length, kt_thickness, kt_height]);
+lid_length = base_length;
+lid_width = base_width;
+lid_height = lid_void_height + base_bottom_thickness;
 
+lid_post_radius=3;
+lid_post_height=5;
 
-}
-
-
-#holder_end();
-#translate([holder_bottom_length - holder_side_length, 0, 0])
-holder_end();
-
-module holder_end(){
-cube([holder_side_length, holder_bottom_width, kt_height + holder_bottom_thickness]);
-
-}
-
-/*
-translate([
-  holder_end_thickness,
-  holder_face_thickness,
-  holder_bottom_thickness - holder_bottom_groove_depth
-  ])
- keytester();
-*/
-
-module keytester(){
-  inner_offset = 1;
-  
-  //base
-  color("grey")
-  difference(){
-  cube([kt_length, kt_width, kt_height]);
-  
-  translate([-inner_offset, kt_thickness, -kt_thickness])
-  cube([
-    kt_length + inner_offset * 2,
-    kt_width - (2 * kt_thickness),
-    kt_height
-  ]);
-  }
-  
-  //keys
-  key_inset_l = 4.4;
-  key_inset_w = 4.7;
-  key_inset_h = 1.25;
-  
-  color("blue")
-  translate([key_inset_l, key_inset_w, kt_height])
-  cube([
-    kt_length - (2 * key_inset_l),
-    kt_width - (2 * key_inset_w),
-    key_inset_h
-  ]);
-
-  key_bottom_height = 5.5;
-  
-  color("blue")
-  translate([key_inset_l, key_inset_w, kt_height - kt_thickness - key_bottom_height])
-  cube([
-    kt_length - (2 * key_inset_l),
-    kt_width - (2 * key_inset_w),
-    key_bottom_height
-  ]);  
-  
-}
-
-teensy_tray_bottom_thickness = 0.8;
-teensy_tray_top_thickness = 0.8;
-!teensy_tray();
-tray_wall_thickness = 1;
-
-module teensy_tray(){
-  tray_width = (tray_wall_thickness * 2) + teensy_lc_board_width;
-  tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length;
-  tray_height = 6;
-  tray_give = 0.2;
-  difference(){
-  cube([
-    tray_length,
-    tray_width,
-    tray_height
-  ]);
-  color("red")
-   translate([tray_wall_thickness, tray_wall_thickness, teensy_tray_bottom_thickness])
-   cube([
-     teensy_lc_board_length + tray_give,
-     teensy_lc_board_width + tray_give,
-     30
-  ]);
-  
-    usb_gap = 8.5;
-    translate([-0.5, (tray_width - usb_gap) / 2, teensy_tray_bottom_thickness + teensy_lc_board_thickness - 0.3])
-    cube([tray_wall_thickness * 2, usb_gap, 10]);
-
-  // filament saver
-  saver_gap_w = teensy_lc_board_width * 0.8;
-  saver_gap_l = teensy_lc_board_length * 0.8;
-  translate([(tray_length - saver_gap_l) / 2,  (tray_width - saver_gap_w) / 2, -2])
-  cube([ saver_gap_l,
-        saver_gap_w,
-        30
-        ]);
-  
-  
-  //pin allowance
-  pin_window_l = teensy_lc_pin_separation * 7;
-    translate([ (tray_length - pin_window_l) / 2, tray_wall_thickness, 0])
-    cube([pin_window_l, 4, teensy_tray_bottom_thickness]);
-    translate([ (tray_length - pin_window_l) / 2, tray_width - tray_wall_thickness - 4, 0])
-    cube([pin_window_l, 4, teensy_tray_bottom_thickness]);
-
-  }  // end difference
-  
-  // peg platform
-  platform_l = 6;
-  translate([tray_length, 0, 0])
-  cube([platform_l, tray_width, tray_height]);
-  // peg
-  peg_height = 1.8;
-  peg_sides = 6;
-  peg_radius = 2;
-  translate([tray_length + (platform_l / 2), tray_width / 4, 0])
-  cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
-  translate([tray_length + (platform_l / 2), tray_width * 3 / 4, 0])
-  cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
-
-
-  //temp cap test
-  cap_thickness = 2.4;
-  translate([0, tray_width+2, 0])
-  difference(){
-    translate([tray_length/2,0,0])
-    cube([tray_length/2, tray_width, cap_thickness]);
-  
-    translate([tray_length - (platform_l / 2), tray_width /4, cap_thickness - peg_height - .1])
-    cylinder(r=peg_radius, h=10);
-    translate([tray_length - (platform_l / 2), tray_width*3 /4, cap_thickness - peg_height - .1])
-    cylinder(r=peg_radius, h=10);
-  }
+usb_gap_width = 13;
     
-  //show the teensy
-  %translate([tray_wall_thickness + tray_give/2, tray_wall_thickness + tray_give/2, teensy_tray_bottom_thickness]) 
-  teensy_lc(bounding_box=false);
+base();
+
+translate([0, base_width + 4, 0]){
+  lid();
 }
+
+module lid(){
+  difference(){
+    union(){
+      cube([
+        lid_length,
+        lid_width,
+        lid_height
+      ]);
+      
+      // rim
+      translate([rim_overhang, rim_overhang, lid_height])
+      cube([
+        base_length - 2*rim_overhang,
+        base_width - 2*rim_overhang,
+        rim_depth - 0.2 
+      ]);
+    }
+
+    translate([wall_thickness, wall_thickness,base_bottom_thickness])
+    cube([
+      lid_void_length,
+      lid_void_width,
+      lid_void_height + 20
+    ]);
+    
+    // Hole for USB cable
+    usb_gap_length = 10;
+    translate([-1, (lid_width-usb_gap_width)/2, -1])
+    cube([
+      usb_gap_length + 1,
+      usb_gap_width,
+      20 //protrude
+    ]);
+  }
+  
+  // button protector
+  protector_length_offset = 29; // how far from edge of shield
+  protector_width = 2;
+  protector_height = 0.9;
+
+  translate([wall_thickness + protector_length_offset, lid_width/2, base_bottom_thickness])
+  cylinder(r=protector_width, height=protector_height);
+  
+  // connection posts
+  translate([wall_thickness + base_void_length + (base_post_platform_length/2), 0, base_void_wall_height + base_bottom_thickness - 10]){
+    translate([0,base_width/5,0])
+    cylinder(r=lid_post_radius, h=lid_post_height, $fn=6);
+      
+    translate([0,4*base_width/5,0])
+    cylinder(r=lid_post_radius, h=lid_post_height, $fn=6);
+  }
+
+    
+}
+
+module base(){
+
+  
+  
+
+  difference(){
+    cube([
+    base_length,
+    base_width,
+    base_height
+    ]);
+    
+    translate([wall_thickness, wall_thickness,base_bottom_thickness])
+    cube([
+    base_void_length,
+    base_void_width,
+    base_void_wall_height + 20 // ensure it protrudes through top
+    ]);
+    
+
+    translate([rim_overhang, rim_overhang, base_height - rim_depth])
+    cube([
+      base_length - 2*rim_overhang,
+      base_width - 2*rim_overhang,
+      20 // ensure it protrudes through top
+    ]);
+    
+    //usb cable allowance
+    base_usb_gap_depth = 8;
+    translate([-1, (base_width - usb_gap_width)/2, base_height - base_usb_gap_depth])
+    cube([
+      20,
+      usb_gap_width,
+      20
+    ]);
+    
+
+    //connection post holes
+    post_depth_roominess = 2;
+    translate([wall_thickness + base_void_length + (base_post_platform_length/2), 0, base_height - rim_depth- lid_post_height - post_depth_roominess]){
+      translate([0,base_width/5,0])
+      cylinder(r=lid_post_radius, h=lid_post_height + 20, $fn=0);
+      
+      translate([0,4*base_width/5,0])
+      cylinder(r=lid_post_radius, h=lid_post_height+ 20, $fn=0);
+    }
+  }
+  
+  //posts
+  translate([wall_thickness + roominess, wall_thickness + roominess, base_bottom_thickness]){
+    translate([shield_post_hole_length_offset, shield_post_hole_width_offset, 0])
+    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
+    
+    translate([shield_length - shield_post_hole_length_offset, shield_post_hole_width_offset, 0])
+    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
+    
+    translate([shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, 0])
+    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
+    
+    translate([shield_length - shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, 0])
+    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
+  }
+  
+  %translate([wall_thickness + roominess, wall_thickness + roominess, base_bottom_thickness])
+  shield();
+
+}
+
+module shield(){
+  difference(){
+    cube([
+      shield_length,
+      shield_width,
+      shield_board_height // board + solder pins
+    ]);
+  
+    translate([shield_post_hole_length_offset, shield_post_hole_width_offset, -1])
+    shield_post(height=20, sides=20);
+    
+    translate([shield_length - shield_post_hole_length_offset, shield_post_hole_width_offset, -1])
+    shield_post(height=20, sides=20);
+    
+    translate([shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, -1])
+    shield_post(height=20, sides=20);
+    
+    translate([shield_length - shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, -1])
+    shield_post(height=20, sides=20);
+  }
+}
+
+module shield_post(height=shield_post_height, sides=0){
+  cylinder(r=shield_post_hole_radius, h=height, $fn=sides);
+}
+
+
