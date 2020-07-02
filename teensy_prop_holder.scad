@@ -24,7 +24,7 @@ base_width = base_void_width + 2 * wall_thickness;
 base_height = base_void_wall_height + base_bottom_thickness;
 
 rim_overhang = wall_thickness / 2;
-rim_depth = 2;
+rim_depth = 3;
 
 lid_void_length = base_void_length;
 lid_void_width = base_void_width;
@@ -34,7 +34,7 @@ lid_length = base_length;
 lid_width = base_width;
 lid_height = lid_void_height + base_bottom_thickness;
 
-lid_post_radius=3;
+lid_post_radius=5;
 lid_post_height=5;
 
 usb_gap_width = 13;
@@ -82,19 +82,17 @@ module lid(){
   
   // button protector
   protector_length_offset = 29; // how far from edge of shield
-  protector_width = 2;
-  protector_height = 0.9;
+  protector_width = 3;
+  protector_height = 3;
 
   translate([wall_thickness + protector_length_offset, lid_width/2, base_bottom_thickness])
-  cylinder(r=protector_width, height=protector_height);
+  cylinder(r=protector_width, h=protector_height);
   
   // connection posts
   translate([wall_thickness + base_void_length + (base_post_platform_length/2), 0, base_void_wall_height + base_bottom_thickness - 10]){
-    translate([0,base_width/5,0])
-    cylinder(r=lid_post_radius, h=lid_post_height, $fn=6);
-      
-    translate([0,4*base_width/5,0])
-    cylinder(r=lid_post_radius, h=lid_post_height, $fn=6);
+    translate([0,base_width/2,0])
+    cylinder(r=lid_post_radius, h=lid_post_height, $fn=8);
+
   }
 
     
@@ -140,27 +138,18 @@ module base(){
     //connection post holes
     post_depth_roominess = 2;
     translate([wall_thickness + base_void_length + (base_post_platform_length/2), 0, base_height - rim_depth- lid_post_height - post_depth_roominess]){
-      translate([0,base_width/5,0])
+      translate([0,base_width/2,0])
       cylinder(r=lid_post_radius, h=lid_post_height + 20, $fn=0);
-      
-      translate([0,4*base_width/5,0])
-      cylinder(r=lid_post_radius, h=lid_post_height+ 20, $fn=0);
+
     }
   }
   
   //posts
   translate([wall_thickness + roominess, wall_thickness + roominess, base_bottom_thickness]){
-    translate([shield_post_hole_length_offset, shield_post_hole_width_offset, 0])
-    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
-    
-    translate([shield_length - shield_post_hole_length_offset, shield_post_hole_width_offset, 0])
-    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
-    
+
     translate([shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, 0])
     cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
-    
-    translate([shield_length - shield_post_hole_length_offset, shield_width - shield_post_hole_width_offset, 0])
-    cylinder(r=shield_post_hole_radius - 0, h=shield_post_height);
+
   }
   
   %translate([wall_thickness + roominess, wall_thickness + roominess, base_bottom_thickness])
