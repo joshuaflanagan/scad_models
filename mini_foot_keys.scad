@@ -35,9 +35,10 @@ teensy_tray_bottom_thickness = 1;
 teensy_tray_top_thickness = 0.8;
 tray_wall_thickness = 1;
 tray_width = (tray_wall_thickness * 2) + teensy_lc_board_width;
-tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length + 0.2;
+tray_length = (tray_wall_thickness * 2) + teensy_lc_board_length; // + 1.4;
 tray_height = 6;
-tray_give = 0.2;
+tray_give_x = 0.2 + 2;
+tray_give_y = 0.2;
 
 key_plate_wall_thickness = 2;
 key_plate_width =(2*switch_end_gap) + (3*cherry_switch_side) + (2*switch_between_gap);
@@ -297,8 +298,8 @@ module teensy_tray(){
   color("red")
    translate([tray_wall_thickness, tray_wall_thickness, teensy_tray_bottom_thickness])
    cube([
-     teensy_lc_board_length + tray_give,
-     teensy_lc_board_width + tray_give,
+     teensy_lc_board_length + tray_give_x,
+     teensy_lc_board_width + tray_give_y,
      30
   ]);
   
@@ -307,7 +308,7 @@ module teensy_tray(){
     cube([tray_wall_thickness * 2, usb_gap, 10]);
 
   // filament saver
-  saver_gap_w = teensy_lc_board_width * 0.8;
+  saver_gap_w = teensy_lc_board_width; // * 0.8;
   saver_gap_l = teensy_lc_board_length * 0.8;
   translate([(tray_length - saver_gap_l) / 2,  (tray_width - saver_gap_w) / 2, -2])
   cube([ saver_gap_l,
@@ -316,15 +317,18 @@ module teensy_tray(){
         ]);
   
   
+/*
   //pin allowance
   pin_window_l = teensy_lc_pin_separation * 7;
     translate([ (tray_length - pin_window_l) / 2, tray_wall_thickness, -0.1])
     cube([pin_window_l, 4, teensy_tray_bottom_thickness + 1]);
     translate([ (tray_length - pin_window_l) / 2, tray_width - tray_wall_thickness - 4, -0.1])
     cube([pin_window_l, 4, teensy_tray_bottom_thickness+ 1]);
+*/
 
   }  // end difference
   
+/*
   // peg platform
   platform_l = 6;
   translate([tray_length, 0, 0])
@@ -337,6 +341,7 @@ module teensy_tray(){
   cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
   translate([tray_length + (platform_l / 2), tray_width * 3 / 4, 0])
   cylinder(r=peg_radius, h=tray_height + peg_height, $fn=peg_sides);
+*/
 
   //temp cap test
   /*
