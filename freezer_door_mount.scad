@@ -54,8 +54,11 @@ slide_ridge_height=mount_floor_height-slide_floor_height;
 slide_hole_distance_from_short=12.7;
 slide_hole_distance_from_tall=12.5;
 
-//TODO:
-tower_rise_angle=8; //maybe only important for end walls and screw towers
+tower_rise_angle=8; //only used for end walls and screw towers
+
+hollow_out_length=18.5; // big enough for freezer clip square
+hollow_out_offset_from_end=(mount_width-hollow_out_length)/2;
+
 
 // Draw it
 main();
@@ -78,12 +81,14 @@ module main(){
     handle_placeholder();
     slide();
     
-    hollow_out_length=18.5; // big enough for freezer clip square
-    translate([mount_wall_width, (mount_width-hollow_out_length)/2, -z])
+
+    translate([mount_wall_width, hollow_out_offset_from_end, -z])
     cube([mount_depth-2*mount_wall_width, hollow_out_length, erase]);
   }
 }
 
+// Two long ovals, the smaller one is a hole, the larger one is the ridge
+// that will slide onto the freezer clasp
 module slide(){
   hull(){
     translate([mount_depth/2, slide_hole_distance_from_short+slide_inner_r, -z])
@@ -101,6 +106,7 @@ module slide(){
 }
 
 
+// gives the long rounded top where the handle will fit in 
 module handle_placeholder(){
  translate([0,0,mount_short_height-handle_seat_depth])
  rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
@@ -136,6 +142,18 @@ module block_hollow(){
         cube([screw_tower_base_diameter, screw_tower_base_square_offset, screw_tower_base_height_tall+z]);
     }
   }
+  
+  // add ridges for clasp hooks to slide on
+  hook_track_width=3.9 + .2; // how wide are the hooks
+  hook_track_length=15 +1; // how long are the hooks
+  hook_track_depth=0.8 +0.2; //how deep of a groove into the surface, for the hook grabber
+
+  
+  color("red")
+  translate([0.8, hollow_out_offset_from_end-hook_track_length, -hook_track_depth])
+  rotate([3,0,0]) // trial and error
+  // add z to height to push it up into the block further, so they are connected
+  cube([hook_track_width, hook_track_length, hook_track_depth+z]);
 }
 
 
