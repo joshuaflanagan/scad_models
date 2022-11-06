@@ -143,15 +143,32 @@ module block_hollow(){
     }
   }
   
-  // add ridges for clasp hooks to slide on
-  hook_track_width=3.9 + .2; // how wide are the hooks
-  hook_track_length=15 +1; // how long are the hooks
-  hook_track_depth=0.8 +0.2; //how deep of a groove into the surface, for the hook grabber
+  hook_track_indent=0.8;
 
+  translate([hook_track_indent, hollow_out_offset_from_end-hook_track_length-2.4, -hook_track_depth])
+  hook_track();
   
+  translate([inner_depth - (hook_track_width+hook_track_indent), hollow_out_offset_from_end-hook_track_length - 2.4, -hook_track_depth])
+  hook_track();
+  
+  tall_end_track_start=hollow_out_offset_from_end+hollow_out_length-2.52;
+  
+  translate([hook_track_indent, tall_end_track_start, 0])
+  hook_track(false);
+  
+  translate([inner_depth - (hook_track_width+hook_track_indent), tall_end_track_start, 0])
+  hook_track(false);
+}
+
+// add ridges for clasp hooks to slide on
+hook_track_width=3.9 + .2; // how wide are the hooks
+hook_track_length=16.5 +1; // how long are the hooks
+hook_track_depth=0.8 +0.2; //how deep of a groove into the surface, for the hook grabber
+
+module hook_track(rise=true){
+  angle=rise ? 3 : -3;
   color("red")
-  translate([0.8, hollow_out_offset_from_end-hook_track_length, -hook_track_depth])
-  rotate([3,0,0]) // trial and error
+  rotate([angle,0,0]) // trial and error
   // add z to height to push it up into the block further, so they are connected
   cube([hook_track_width, hook_track_length, hook_track_depth+z]);
 }
