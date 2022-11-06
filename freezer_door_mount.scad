@@ -55,11 +55,20 @@ slide_hole_distance_from_short=12.7;
 slide_hole_distance_from_tall=12.5;
 
 //TODO:
-tower_rise_angle=78; //maybe only important for end walls and screw towers
+tower_rise_angle=8; //maybe only important for end walls and screw towers
 
 // Draw it
 main();
 
+module slant(angle){
+  multmatrix(m = [ 
+  [1, 0,           0, 0],
+  [0, 1, sin(angle), 0],
+  [0,0,1,0],
+  [0,          0,           0, 1]
+
+  ]) children();
+}
 
 module main(){
   difference(){
@@ -105,17 +114,21 @@ module block_hollow(){
   inner_depth=mount_depth-(2*mount_wall_width);
 
   difference(){
+    slant(tower_rise_angle)
     cube([inner_depth, mount_width-(2*mount_wall_width), mount_tall_height+erase]);
     
+    // screw tower short
     translate([inner_depth/2, screw_hole_distance_from_side-mount_wall_width,-z]){
+      slant(tower_rise_angle)
       cylinder(h=screw_tower_height_short+z, r=screw_tower_r);
       cylinder(h=screw_tower_base_height_short+z, r=screw_tower_base_r);
     }
     translate([inner_depth/2 - screw_tower_base_r, 0, -z])
       cube([screw_tower_base_diameter, screw_tower_base_square_offset, screw_tower_base_height_short+z]);
 
-    
+    // screw tower tall
     translate([inner_depth/2, screw_hole_distance_from_side-mount_wall_width + distance_between_screws,-z]){
+      slant(tower_rise_angle)
       cylinder(h=screw_tower_height_tall+z, r=screw_tower_r);
       cylinder(h=screw_tower_base_height_tall+z, r=screw_tower_base_r);
       
@@ -127,6 +140,7 @@ module block_hollow(){
 
 
 module main_block(){
+  slant(tower_rise_angle)
   difference(){
     cube([mount_depth, mount_width, mount_tall_height]);
     
