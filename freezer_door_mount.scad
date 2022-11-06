@@ -21,9 +21,9 @@ handle_seat_depth=mount_tall_height-21;
 //  radius of an arc = H/2 + W^2 / 8*H https://www.mathopenref.com/arcradius.html
 handle_radius = handle_seat_depth/2 + (mount_depth*mount_depth)/(8 * handle_seat_depth);
 
-// distance between 2 screw hole centers: 49. which means they are 10 off from edge
-distance_between_screws=49;
-screw_hole_diameter=3.75;
+// distance between 2 screw hole centers
+distance_between_screws=56;
+screw_hole_diameter=4.6;
 screw_hole_r=screw_hole_diameter/2;
 
 screw_tower_diameter=7.6;
@@ -42,7 +42,7 @@ screw_head_hole_depth_tall=8.3;
 screw_head_hole_diameter=screw_tower_base_diameter-(2*screw_head_hole_wall_width);
 screw_head_hole_r=screw_head_hole_diameter/2;
 
-screw_tower_base_square_offset=7.2; //trial and error to get the cube to line up with cylinder
+screw_tower_base_square_offset=5.0; //trial and error to get the cube to line up with cylinder
 
 slide_ridge_diameter=18;
 slide_ridge_r=slide_ridge_diameter / 2;
