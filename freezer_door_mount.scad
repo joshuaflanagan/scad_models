@@ -4,6 +4,11 @@ $fs=.7;
 erase=100; // used to make something extend through holes
 z=1; // a fudge factor to punch through the plane
 
+// The entire piece is the "mount". width along y, depth along x, height along z
+// The "bottom" is the part that touches the freezer. It is at z=0.
+// The "top" is the part that connects to the handle.
+
+
 mount_width = 69;
 mount_depth=28.6;
 mount_short_height=20;
@@ -20,9 +25,7 @@ handle_radius = handle_seat_depth/2 + (mount_depth*mount_depth)/(8 * handle_seat
 distance_between_screws=49;
 screw_hole_diameter=3.75;
 screw_hole_r=screw_hole_diameter/2;
-screw_sink_diameter=8.4;
-screw_sink_r = screw_sink_diameter/2;
-screw_sink_depth=6.26;
+
 screw_tower_diameter=7.6;
 screw_tower_r=screw_tower_diameter/2;
 screw_hole_distance_from_side=(mount_width-distance_between_screws)/2; //4.5 + screw_hole_r;
@@ -48,17 +51,14 @@ slide_inner_r=slide_inner_diameter / 2;
 slide_floor_height=2.4;
 slide_ridge_height=mount_floor_height-slide_floor_height;
 
-
 slide_hole_distance_from_short=12.7;
 slide_hole_distance_from_tall=12.5;
 
+//TODO:
+tower_rise_angle=78; //maybe only important for end walls and screw towers
+
 // Draw it
 main();
-
-//main_block();
-//block_hollow();
-//full_slide();
- 
 
 
 module main(){
@@ -69,36 +69,34 @@ module main(){
     handle_placeholder();
     slide();
     
-    hollow_out_length=18.5;
+    hollow_out_length=18.5; // big enough for freezer clip square
     translate([mount_wall_width, (mount_width-hollow_out_length)/2, -z])
     cube([mount_depth-2*mount_wall_width, hollow_out_length, erase]);
   }
 }
 
 module slide(){
-  
   hull(){
-  translate([mount_depth/2, slide_hole_distance_from_short+slide_inner_r, -z])
+    translate([mount_depth/2, slide_hole_distance_from_short+slide_inner_r, -z])
     cylinder(h=erase, r=slide_inner_r);
     translate([mount_depth/2, mount_width-(slide_hole_distance_from_tall+slide_inner_r), -z])
     cylinder(h=erase, r=slide_inner_r);
   }
   
   hull(){
-  translate([mount_depth/2, slide_hole_distance_from_short+slide_inner_r, -z])
+    translate([mount_depth/2, slide_hole_distance_from_short+slide_inner_r, -z])
     cylinder(h=slide_ridge_height+z, r=slide_ridge_r);
-  translate([mount_depth/2, mount_width-(slide_hole_distance_from_tall+slide_inner_r), -z])
+    translate([mount_depth/2, mount_width-(slide_hole_distance_from_tall+slide_inner_r), -z])
     cylinder(h=slide_ridge_height+z, r=slide_ridge_r);
   }
-  
 }
 
 
 module handle_placeholder(){
-  translate([0,0,mount_short_height-handle_seat_depth])
-rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
-translate([mount_depth/2,-handle_radius,0])
-  cylinder(h=100, r=handle_radius);
+ translate([0,0,mount_short_height-handle_seat_depth])
+ rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
+ translate([mount_depth/2,-handle_radius,0])
+   cylinder(h=100, r=handle_radius);
 }
 
 
@@ -129,8 +127,6 @@ module block_hollow(){
 
 
 module main_block(){
-
-  
   difference(){
     cube([mount_depth, mount_width, mount_tall_height]);
     
@@ -156,47 +152,4 @@ module main_block(){
     //screw head hole on bottom
     cylinder(h=depth,r=screw_head_hole_r);
   }
-}
-
-
-module full_slide(){
-outer_depth=mount_width/2+5;
-
-
-// build 2 slides across from each other
-slide_end();
-rotate([0,0,180])
-translate([mount_depth,-outer_depth, 0])
-translate([0, outer_depth-mount_width, 0])
-slide_end();
-
-
-
-module slide_end(){
-
-  translate([0,0,mount_floor_height])
-  rotate([0,180,0])
-  difference(){
-    color("green")
-    cube([mount_depth, outer_depth, mount_floor_height+0]);
-  
-    // inner gap
-    translate([mount_depth/2, 20, -z]){
-        cylinder(h=erase, r=slide_inner_r);
-
-    }
-    translate([mount_depth/2 - slide_inner_r, 20, -z])
-        cube([slide_inner_r*2, erase, erase]);
-    
-    // inner gap ridge
-    translate([mount_depth/2, 20, slide_ridge_height-erase]){
-        cylinder(h=erase, r=slide_ridge_r);
-    }
-    
-    translate([mount_depth/2 - slide_ridge_r, 20, slide_ridge_height-erase]){
-        cube([slide_ridge_r*2, erase, erase]);
-    }
-
-  }
-}
 }
