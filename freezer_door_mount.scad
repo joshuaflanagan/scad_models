@@ -2,6 +2,7 @@ $fa=1;
 $fs=.7;
 
 erase=100; // used to make something extend through holes
+z=1; // a fudge factor to punch through the plane
 
 mount_width = 69;
 mount_depth=28.6;
@@ -24,20 +25,29 @@ screw_sink_r = screw_sink_diameter/2;
 screw_sink_depth=6.26;
 screw_tower_diameter=7.6;
 screw_tower_r=screw_tower_diameter/2;
+screw_hole_distance_from_side=(mount_width-distance_between_screws)/2;
+screw_tower_height_short=12; //8.8; // top of tower down to base plastic top
+screw_tower_height_tall=16; // this might not matter, should get chopped by handle cylinder
+screw_tower_base_diameter=12.45;
+screw_tower_base_r=screw_tower_base_diameter/2;
+screw_tower_base_height_short=2.6;
+screw_tower_base_height_tall=6;
+
+screw_head_hole_wall_width=1.2;
+screw_head_hole_depth=8.3;
+screw_head_hole_diameter=screw_tower_base_diameter-(2*screw_head_hole_wall_width);
+screw_head_hole_r=screw_head_hole_diameter/2;
+
+screw_tower_base_square_offset=7.2; //trial and error to get the cube to line up with cylinder
 
 // Draw it!
 main();
 
-
+//main_block();
+//block_hollow();
 
  
 
-module handle_placeholder(){
-  translate([0,0,mount_short_height-handle_seat_depth])
-rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
-translate([mount_depth/2,-handle_radius,0])
-  cylinder(h=100, r=handle_radius);
-}
 
 module main(){
   difference(){
@@ -50,28 +60,67 @@ module main(){
   }
 }
 
+module handle_placeholder(){
+  translate([0,0,mount_short_height-handle_seat_depth])
+rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
+translate([mount_depth/2,-handle_radius,0])
+  cylinder(h=100, r=handle_radius);
+}
+
+
+
 module block_hollow(){
-  cube([mount_depth-(2*mount_wall_width), mount_width-(2*mount_wall_width), mount_tall_height+erase]);
+  inner_depth=mount_depth-(2*mount_wall_width);
+
+  difference(){
+    cube([inner_depth, mount_width-(2*mount_wall_width), mount_tall_height+erase]);
+    
+    translate([inner_depth/2, screw_hole_distance_from_side-mount_wall_width,-z]){
+      cylinder(h=screw_tower_height_short+z, r=screw_tower_r);
+      cylinder(h=screw_tower_base_height_short+z, r=screw_tower_base_r);
+    }
+    translate([inner_depth/2 - screw_tower_base_r, 0, -z])
+      cube([screw_tower_base_diameter, screw_tower_base_square_offset, screw_tower_base_height_short+z]);
+
+    
+    translate([inner_depth/2, screw_hole_distance_from_side-mount_wall_width + distance_between_screws,-z]){
+      cylinder(h=screw_tower_height_tall+z, r=screw_tower_r);
+      cylinder(h=screw_tower_base_height_tall+z, r=screw_tower_base_r);
+      
+      translate([-screw_tower_base_r,0,0])
+        cube([screw_tower_base_diameter, screw_tower_base_square_offset, screw_tower_base_height_tall+z]);
+    }
+  }
 }
 
 
 module main_block(){
-  screw_hole_distance_from_side=(mount_width-distance_between_screws)/2;
+
   
   difference(){
     cube([mount_depth, mount_width, mount_tall_height]);
     
     //short end screw (closest to origin)
-    translate([ mount_depth/2, screw_hole_distance_from_side, -1])
+    translate([ mount_depth/2, screw_hole_distance_from_side, -z])
     screw_hole();
     
+    bottom_square_tower_base=screw_tower_base_diameter-2*screw_head_hole_wall_width;
+
+    translate([mount_depth/2 - bottom_square_tower_base/2, mount_wall_width, -z])
+    cube([bottom_square_tower_base, screw_tower_base_square_offset, screw_head_hole_depth]);
+    
     //tall end screw (furthest to origin)
-    translate([ mount_depth/2, screw_hole_distance_from_side + distance_between_screws, -1])
+    translate([ mount_depth/2, screw_hole_distance_from_side + distance_between_screws, -z])
     screw_hole();
+    
+    translate([mount_depth/2 - bottom_square_tower_base/2, mount_wall_width+distance_between_screws+screw_tower_base_square_offset, -z])
+    cube([bottom_square_tower_base, screw_tower_base_square_offset, screw_head_hole_depth]);
   }
   
   module screw_hole(){
     cylinder(h=erase, r=screw_hole_r);
+    //screw head hole on bottom
+    cylinder(h=screw_head_hole_depth,r=screw_head_hole_r);
   }
 }
 
@@ -102,11 +151,11 @@ ridge_height=mount_floor_height-2.4;
     cube([mount_depth, outer_depth, mount_floor_height+0]);
   
     // inner gap
-    translate([mount_depth/2, 20, -1]){
+    translate([mount_depth/2, 20, -z]){
         cylinder(h=erase, r=inner_radius);
 
     }
-    translate([mount_depth/2 - inner_radius, 20, -1])
+    translate([mount_depth/2 - inner_radius, 20, -z])
         cube([inner_radius*2, erase, erase]);
     
     // inner gap ridge
