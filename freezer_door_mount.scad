@@ -9,6 +9,11 @@ mount_short_height=20;
 mount_tall_height=27.4;
 mount_wall_width=2.5;
 mount_floor_height=5;
+handle_seat_depth=mount_tall_height-21;
+
+// find radius of handle
+//  radius of an arc = H/2 + W^2 / 8*H https://www.mathopenref.com/arcradius.html
+handle_radius = handle_seat_depth/2 + (mount_depth*mount_depth)/(8 * handle_seat_depth);
 
 // distance between 2 screw hole centers: 49. which means they are 10 off from edge
 distance_between_screws=49;
@@ -21,12 +26,28 @@ screw_tower_diameter=7.6;
 screw_tower_r=screw_tower_diameter/2;
 
 // Draw it!
+main();
 
-difference(){
-  main_block();
-//full_slide();
-  translate([mount_wall_width, mount_wall_width, mount_floor_height])
-  block_hollow();
+
+
+ 
+
+module handle_placeholder(){
+  translate([0,0,mount_short_height-handle_seat_depth])
+rotate([-83.9,0,0]) // figured by trial and error to get sharp point at tall side
+translate([mount_depth/2,-handle_radius,0])
+  cylinder(h=100, r=handle_radius);
+}
+
+module main(){
+  difference(){
+    main_block();
+  //full_slide();
+    translate([mount_wall_width, mount_wall_width, mount_floor_height])
+    block_hollow();
+    
+    handle_placeholder();
+  }
 }
 
 module block_hollow(){
